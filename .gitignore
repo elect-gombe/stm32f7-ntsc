@@ -1,0 +1,4 @@
+/stm32f7_test/build/*
+/stm32f7_test/G*
+!/stm32f7_test/build/*.bin
+!/stm32f7_test/build/*.elf

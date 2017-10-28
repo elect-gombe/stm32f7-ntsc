@@ -1,0 +1,15 @@
+#ifndef _COMPOSITE_H
+#define _COMPOSITE_H
+
+
+#define BUFFER_SIZE (3632/2/4)
+
+static
+uint32_t composite_buffer[BUFFER_SIZE];
+
+
+#define VIDEO_AREA_BEGIN 76
+#define VIDEO_WIDTH 320
+#define VIDEO_HEIGHT 224
+
+#endif
