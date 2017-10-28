@@ -8,6 +8,7 @@
 #define VIDEO_HEIGHT 224
 
 uint16_t vram[VIDEO_HEIGHT * VIDEO_WIDTH];
+uint32_t composite_buffer[BUFFER_SIZE*2];
 
 int g_line;
 

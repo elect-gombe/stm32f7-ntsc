@@ -29,4 +29,6 @@ uint32_t colordata[NUMBER_OF_COLORS*2];
 extern
 uint16_t vram[VIDEO_WIDTH*VIDEO_HEIGHT];
 
+void vtask(uint32_t *buff);
+
 #endif

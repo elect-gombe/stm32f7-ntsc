@@ -55,7 +55,7 @@
 #include "dma.h"
 
 /* USER CODE BEGIN 0 */
-
+#include "composite.h"
 /* USER CODE END 0 */
 
 QSPI_HandleTypeDef hqspi;
@@ -212,6 +212,7 @@ static void QSPI_DMATxCplt(DMA_HandleTypeDef *hdma)
   QSPI_HandleTypeDef* hqspi = ( QSPI_HandleTypeDef* )((DMA_HandleTypeDef* )hdma)->Parent;
   hqspi->TxXferCount = 0;
   
+  vtask(composite_buffer);
   /* Enable the QSPI transfer complete Interrupt */
   __HAL_QSPI_ENABLE_IT(hqspi, QSPI_IT_TC);
 }
@@ -223,9 +224,8 @@ static void QSPI_DMATxCplt(DMA_HandleTypeDef *hdma)
   */
 static void QSPI_DMATxHalfCplt(DMA_HandleTypeDef *hdma)
 {
-  QSPI_HandleTypeDef* hqspi = (QSPI_HandleTypeDef*)((DMA_HandleTypeDef*)hdma)->Parent;
 
-  HAL_QSPI_TxHalfCpltCallback(hqspi);
+  vtask(composite_buffer+BUFFER_SIZE);
 }
 
 /**
@@ -426,8 +426,7 @@ HAL_StatusTypeDef HAL_QSPI_Transmit_DMA_infenity(QSPI_HandleTypeDef *hqspi, uint
           /* The number of data or the fifo threshold is not aligned on halfword 
           => no transfer possible with DMA peripheral access configured as halfword */
           hqspi->ErrorCode |= HAL_QSPI_ERROR_INVALID_PARAM;
-          status = HAL_ERROR;
-          
+          status = HAL_ERROR; 
           /* Process unlocked */
           __HAL_UNLOCK(hqspi);
         }
