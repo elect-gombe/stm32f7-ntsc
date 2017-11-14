@@ -60,7 +60,7 @@
 #include "gpio.h"
 
 /* USER CODE BEGIN Includes */
-
+#include "composite.h"
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -98,8 +98,6 @@ int main(void)
   sCommand.DataMode    = QSPI_DATA_4_LINES;
   sCommand.DummyCycles = 0;
 
-  uint8_t txdata[16] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-			0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,};
   /* USER CODE END 1 */
 
   /* Enable I-Cache-------------------------------------------------------------*/
@@ -148,7 +146,7 @@ int main(void)
     /* USER CODE BEGIN 3 */
     
     QSPI_Config_infenity(&hqspi, &sCommand, 0);
-    HAL_QSPI_Transmit_DMA_infenity(&hqspi,txdata ,sizeof(txdata));
+    HAL_QSPI_Transmit_DMA_infenity(&hqspi,composite_buffer ,sizeof(composite_buffer));
     while(1);
   }
   /* USER CODE END 3 */
@@ -168,11 +166,11 @@ void SystemClock_Config(void)
     */
   __HAL_RCC_PWR_CLK_ENABLE();
 
-  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
+  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
 
     /**Initializes the CPU, AHB and APB busses clocks 
     */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = 16;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;

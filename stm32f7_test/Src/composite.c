@@ -8,7 +8,7 @@
 #define VIDEO_HEIGHT 224
 
 uint16_t vram[VIDEO_HEIGHT * VIDEO_WIDTH];
-uint32_t composite_buffer[BUFFER_SIZE*2];
+uint32_t composite_buffer[VBUFFER_SIZE*2] = {0xFFFFFFFF};
 
 int g_line;
 
@@ -17,7 +17,7 @@ static
 void HSync(uint32_t *buff){
   int i=0;
   for(;i<33;i++){
-    buff[i] = 0;
+    buff[i] = 0x00000000;
   }
   buff[i++] = 0x33333333>>(4*5);
   for(;i<38;i++){
@@ -27,7 +27,7 @@ void HSync(uint32_t *buff){
     buff[i] = 0x23111122;
     buff[i++] = 0x33545544;
   }
-  for(;i<BUFFER_SIZE;i++){
+  for(;i<VBUFFER_SIZE;i++){
     buff[i] = 0x33333333;
   }
 }
@@ -40,8 +40,8 @@ void VSync(uint32_t *buff){
     buff[i] = 0;
   }
   buff[i] = 0x33333333>>(3*4);
-  for(;i<BUFFER_SIZE;i++){
-    buff[i] = 0;
+  for(;i<VBUFFER_SIZE;i++){
+    buff[i] = 0x33333333;
   }
 }
 
@@ -62,7 +62,7 @@ void vtask(uint32_t *buff){
     graphic_buffering(buff, vram+VIDEO_WIDTH*(g_line-VIDEO_PREEQ));
   }
   g_line++;
-  if(g_line < VIDEO_NTSC){
+  if(g_line >= VIDEO_NTSC){
     g_line = 0;
   }
 }

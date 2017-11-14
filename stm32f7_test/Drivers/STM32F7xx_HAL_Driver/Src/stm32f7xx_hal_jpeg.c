@@ -1502,7 +1502,7 @@ HAL_StatusTypeDef  HAL_JPEG_Decode_DMA(JPEG_HandleTypeDef *hjpeg ,uint8_t *pData
     hjpeg->InDataLength = InDataLength;
     hjpeg->OutDataLength = OutDataLength;
     
-    /*Reset In/out data counter */
+  /*Reset In/out data counter */
     hjpeg->JpegInCount = 0;    
     hjpeg->JpegOutCount = 0;    
     

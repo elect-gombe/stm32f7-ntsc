@@ -2,13 +2,13 @@
 #define _COMPOSITE_H
 
 
-#define BUFFER_SIZE (3632/2/4)
+#define VBUFFER_SIZE (3632/2/4)
 #define NUMBER_OF_COLORS 4096
 
 /*横の出力範囲*/
 #define VIDEO_AREA_BEGIN 76
 
-/*解像度定義(it's editable, but no zoom & no fitting)*/
+/*解像度定義(it's modifable, but no zoom & no fitting)*/
 #define VIDEO_WIDTH 320
 #define VIDEO_HEIGHT 224
 
@@ -21,7 +21,7 @@
 #define VIDEO_PREEQ 18
 
 extern
-uint32_t composite_buffer[BUFFER_SIZE*2];
+uint32_t composite_buffer[VBUFFER_SIZE*2];
 
 extern
 uint32_t colordata[NUMBER_OF_COLORS*2];

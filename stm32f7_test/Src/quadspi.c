@@ -66,7 +66,7 @@ void MX_QUADSPI_Init(void)
 {
 
   hqspi.Instance = QUADSPI;
-  hqspi.Init.ClockPrescaler = 255;
+  hqspi.Init.ClockPrescaler = 6;
   hqspi.Init.FifoThreshold = 4;
   hqspi.Init.SampleShifting = QSPI_SAMPLE_SHIFTING_NONE;
   hqspi.Init.FlashSize = 31;
@@ -143,8 +143,8 @@ void HAL_QSPI_MspInit(QSPI_HandleTypeDef* qspiHandle)
     hdma_quadspi.Init.Direction = DMA_PERIPH_TO_MEMORY;
     hdma_quadspi.Init.PeriphInc = DMA_PINC_DISABLE;
     hdma_quadspi.Init.MemInc = DMA_MINC_ENABLE;
-    hdma_quadspi.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
-    hdma_quadspi.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
+    hdma_quadspi.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
+    hdma_quadspi.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
     hdma_quadspi.Init.Mode = DMA_CIRCULAR;
     hdma_quadspi.Init.Priority = DMA_PRIORITY_HIGH;
     hdma_quadspi.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
@@ -191,16 +191,10 @@ void HAL_QSPI_MspDeInit(QSPI_HandleTypeDef* qspiHandle)
     /* QUADSPI DMA DeInit */
     HAL_DMA_DeInit(qspiHandle->hdma);
   /* USER CODE BEGIN QUADSPI_MspDeInit 1 */
-
+    
   /* USER CODE END QUADSPI_MspDeInit 1 */
   }
 } 
-
-/* USER CODE BEGIN 1 */
-#define QSPI_FUNCTIONAL_MODE_INDIRECT_WRITE ((uint32_t)0x00000000U)          /*!<Indirect write mode*/
-#define QSPI_FUNCTIONAL_MODE_INDIRECT_READ  ((uint32_t)QUADSPI_CCR_FMODE_0) /*!<Indirect read mode*/
-#define QSPI_FUNCTIONAL_MODE_AUTO_POLLING   ((uint32_t)QUADSPI_CCR_FMODE_1) /*!<Automatic polling mode*/
-#define QSPI_FUNCTIONAL_MODE_MEMORY_MAPPED  ((uint32_t)QUADSPI_CCR_FMODE)   /*!<Memory-mapped mode*/
 
 /**
   * @brief  DMA QSPI transmit process complete callback. 
@@ -213,6 +207,15 @@ static void QSPI_DMATxCplt(DMA_HandleTypeDef *hdma)
   hqspi->TxXferCount = 0;
   
   vtask(composite_buffer);
+  {
+    uint32_t alignedAddr;
+    /*
+      the SCB_CleanDCache_by_Addr() requires a 32-Byte aligned address
+      adjust the address and the D-Cache size to clean accordingly.
+    */
+    alignedAddr = (uint32_t)composite_buffer & ~0x1F;
+    SCB_CleanDCache_by_Addr((uint32_t*)alignedAddr, VBUFFER_SIZE + ((uint32_t)composite_buffer - alignedAddr));
+  }
   /* Enable the QSPI transfer complete Interrupt */
   __HAL_QSPI_ENABLE_IT(hqspi, QSPI_IT_TC);
 }
@@ -224,8 +227,16 @@ static void QSPI_DMATxCplt(DMA_HandleTypeDef *hdma)
   */
 static void QSPI_DMATxHalfCplt(DMA_HandleTypeDef *hdma)
 {
-
-  vtask(composite_buffer+BUFFER_SIZE);
+  vtask(composite_buffer+VBUFFER_SIZE);
+  {
+    uint32_t alignedAddr;
+    /*
+      the SCB_CleanDCache_by_Addr() requires a 32-Byte aligned address
+      adjust the address and the D-Cache size to clean accordingly.
+    */
+    alignedAddr = (uint32_t)(composite_buffer+VBUFFER_SIZE) & ~0x1F;
+    SCB_CleanDCache_by_Addr((uint32_t*)alignedAddr, VBUFFER_SIZE + ((uint32_t)(composite_buffer+VBUFFER_SIZE) - alignedAddr));
+  }
 }
 
 /**
