@@ -19,7 +19,7 @@ void HSync(uint32_t *buff){
   for(;i<33;i++){
     buff[i] = 0x00000000;
   }
-  buff[i++] = 0x33333333>>(4*5);
+  buff[i++] = 0x33333333<<(4*4);
   for(;i<38;i++){
     buff[i] = 0x33333333;
   }
